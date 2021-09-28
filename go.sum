@@ -1,0 +1,3 @@
+github.com/jursonmo/mylog v0.0.0-20190502100552-81a45fcb1cda/go.mod h1:ec5lneXg5h/e3lFbnnSSlD4tMMm55ZsxXWnGc7sydsI=
+golang.org/x/sys v0.0.0-20210124154548-22da62e12c0c h1:VwygUrnw9jn88c4u8GD3rZQbqrP/tgas88tPUbBxQrk=
+golang.org/x/sys v0.0.0-20210124154548-22da62e12c0c/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
