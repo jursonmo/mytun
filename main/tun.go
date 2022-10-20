@@ -113,12 +113,14 @@ func (tun *mytun) Name() string {
 }
 
 func (tun *mytun) Read(buf []byte) (n int, err error) {
-	var inpkt *tuntap.Packet
-	inpkt, err = tun.tund.ReadPacket2(buf[0:])
-	if err != nil {
-		logs.Error("%s ReadPacket error:%s", tun.Name(), err.Error())
-		return
-	}
-	n = len(inpkt.Packet)
-	return
+	// var inpkt *tuntap.Packet
+	// inpkt, err = tun.tund.ReadPacket2(buf[0:])
+	// if err != nil {
+	// 	logs.Error("%s ReadPacket error:%s", tun.Name(), err.Error())
+	// 	return
+	// }
+	// n = len(inpkt.Packet)
+	//return
+
+	return tun.tund.ReadPacket3(buf[0:])
 }

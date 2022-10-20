@@ -94,6 +94,8 @@ func (t *Interface) SetNonblock() {
 	//syscall.Socket()
 }
 
+//执行以下命令做逃逸分析:
+//xxx-MBP:main obc$ GOOS=linux go build -gcflags=-m ./lab11/go-tuntap/tuntap/tun.go  ./github.com/lab11/go-tuntap/tuntap/*_linux.go
 func (t *Interface) ReadPacket2(buf []byte) (*Packet, error) {
 	//buf := make([]byte, 10000)
 
@@ -111,9 +113,19 @@ func (t *Interface) ReadPacket2(buf []byte) (*Packet, error) {
 			pkt.Truncated = true
 		}
 	} else {
-		pkt = &Packet{Packet: buf[0:n]}
+		pkt = &Packet{Packet: buf[0:n]} //  ./lab11/go-tuntap/tuntap/tun.go:114:9: &Packet{...} escapes to heap
 	}
 	return pkt, nil
+}
+
+//做了逃逸分析后，就不用ReadPacket2，改用ReadPacket3
+func (t *Interface) ReadPacket3(buf []byte) (int, error) {
+	return t.file.Read(buf)
+}
+
+func (t *Interface) WritePacket3(buf []byte) error {
+	_, err := t.file.Write(buf)
+	return err
 }
 
 // Send a single packet to the kernel.
