@@ -88,7 +88,17 @@ func createInterface(ifPattern string, kind DevKind, meta bool) (*os.File, strin
 	var req ifReq
 	//req.Flags = iffOneQueue
 	//req.Flags = 0
+	/*about  IFF_MULTI_QUEUE,
+	// 	#define IFF_ONE_QUEUE	0x2000
+	// #define IFF_MULTI_QUEUE 0x0100
+	tun_set_iff():
+	int queues = ifr->ifr_flags & IFF_MULTI_QUEUE ?
+				 MAX_TAP_QUEUES : 1;
 
+	dev = alloc_netdev_mqs(sizeof(struct tun_struct), name,
+		NET_NAME_UNKNOWN, tun_setup, queues,
+		queues);
+	*/
 	req.Flags = ifMulti
 
 	if len(ifPattern) > 15 {
@@ -133,6 +143,19 @@ func createInterface(ifPattern string, kind DevKind, meta bool) (*os.File, strin
 	if !meta {
 		req.Flags |= iffnopi
 	}
+	/*
+		如果IFF_NO_PI标志没有被设置，每一帧格式如下：
+		Flags [2 bytes]
+		Proto [2 bytes]
+		Raw protocol(IP, IPv6, etc) frame.
+
+		// Protocol info prepended to the packets (when IFF_NO_PI is not set)
+		#define TUN_PKT_STRIP	0x0001  //#include <linux/if_tun.h>// include/uapi/linux/if_tun.h
+		struct tun_pi {
+			__u16  flags;
+			__be16 proto;
+		};
+	*/
 	//file.Fd() remove fd from netpoll
 	_, _, syserr := syscall.Syscall(syscall.SYS_IOCTL, uintptr(tunfd), uintptr(syscall.TUNSETIFF), uintptr(unsafe.Pointer(&req)))
 	if syserr != 0 {
