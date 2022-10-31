@@ -160,3 +160,18 @@ static ssize_t tun_get_user(struct tun_struct *tun, struct tun_file *tfile,
 tun_fd  tun_sendmsg() 方法，按道理，可以在大流量的情况下，减少tun_fd 往内核注入数据的系统调用的次数，同时 让 tun napi 的 一次处理多个数据，把数据在内核协议栈的处理用软中断处理，这样tun_fd  注入内核就没那么消耗CPU， 应用层就有更多cpu资源来处理业务逻辑。
 
 但是golang 是用syscall 来调用senmsg, 不受netpoller 控制， 只有正常tun_fd_conn write 才由netpoller 控制。
+
+
+
+#### 后来再测试：
+后来测试，发现5.4.34 内核版本跟上面描述的问题一样，从tun queue1 写入数据，同一个连接的数据却从tun 其他queue 读出来
+```
+# uname -a
+Linux 5.4.34.obc-hy #1 SMP Mon Jun 1 18:46:27 CST 2020 x86_64 x86_64 x86_64 GNU/Linux
+```
+我在虚拟机上测试， 却能保证从tun queue 写入的，就从那个tun queue 读出。即从哪个队列写入，就从哪个队列读出。
+查看5.4.0 内核：
+```
+root@ubuntu:~# uname -a
+Linux ubuntu 5.4.0-90-generic #101-Ubuntu SMP Fri Oct 15 20:00:55 UTC 2021 x86_64 x86_64 x86_64 GNU/Linux
+```
